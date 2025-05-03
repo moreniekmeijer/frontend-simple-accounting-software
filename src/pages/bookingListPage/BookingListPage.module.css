@@ -1,0 +1,4 @@
+.bookingList {
+    border: 1px solid var(--second-color);
+    color: var(--third-color);
+}

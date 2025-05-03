@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useForm, useFieldArray} from "react-hook-form";
 import axios from "axios";
+import Button from "../button/Button.jsx";
 
 function CreateInvoiceForm() {
     const {register, control, handleSubmit, reset} = useForm({
@@ -119,7 +120,7 @@ function CreateInvoiceForm() {
                     </button>
                 </div>
 
-                <button type="submit">Create Invoice</button>
+                <Button type="submit">Create Invoice</Button>
             </form>
             {createdInvoice && (
                 <div className="mt-4">

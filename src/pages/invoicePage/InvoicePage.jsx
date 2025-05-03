@@ -1,9 +1,9 @@
 import CreateInvoiceForm from "../../components/createInvoiceForm/CreateInvoiceForm.jsx";
 
-function HomePage() {
+function InvoicePage() {
     return (
         <CreateInvoiceForm/>
     )
 }
 
-export default HomePage;
+export default InvoicePage;

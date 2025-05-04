@@ -5,6 +5,7 @@ import InvoicePage from "./pages/invoicePage/InvoicePage.jsx";
 import ClientPage from "./pages/clientPage/ClientPage.jsx";
 import BookingListPage from "./pages/bookingListPage/BookingListPage.jsx";
 import YearOverviewPage from "./pages/yearOverviewPage/YearOverviewPage.jsx";
+import ExpensePage from "./pages/expensePage/ExpensePage.jsx";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Navigate to="/invoices" />} />
                     <Route path="/invoices" element={<InvoicePage />} />
+                    <Route path="/expenses" element={<ExpensePage />} />
                     <Route path="/clients" element={<ClientPage />} />
                     <Route path="/bookings" element={<BookingListPage />} />
                     <Route path="/year-overview" element={<YearOverviewPage />} />

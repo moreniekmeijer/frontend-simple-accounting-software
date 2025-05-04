@@ -1,29 +1,60 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./BookingListPage.module.css";
 
 function BookingListPage() {
     const [bookings, setBookings] = useState([]);
 
     useEffect(() => {
-        const dummy = [
-            { nr: 1, date: "1-1", post: "Makro (koop laptop)", code: "", category: "investering", vat: "21%", income: 0, expense: 0 },
-            { nr: 2, date: "1-1", post: "RME Fireface 802", code: "", category: "investering", vat: "0%", income: 0, expense: 85 },
-            { nr: 3, date: "1-1", post: "Macbook Air", code: "", category: "investering", vat: "0%", income: 0, expense: 200 },
-            { nr: 4, date: "26-1", post: "Tom Gregoor", code: "20250101", category: "honorarium", vat: "0%", income: 250, expense: 0 },
-            { nr: 5, date: "6-2", post: "WAMV", code: "WA202501", category: "honorarium", vat: "0%", income: 715, expense: 0 },
-            { nr: 6, date: "6-2", post: "T2 Centrum voor Muziek V.O.F.", code: "T2202501", category: "honorarium", vat: "0%", income: 280.93, expense: 0 },
-            { nr: 7, date: "19-3", post: "WAMV", code: "WA202502", category: "honorarium", vat: "0%", income: 715, expense: 0 },
-            { nr: 8, date: "19-3", post: "T2 Centrum voor Muziek V.O.F.", code: "T2202502", category: "honorarium", vat: "0%", income: 280.93, expense: 0 },
-            { nr: 9, date: "4-4", post: "Twents Jeugd SymfonieOrkest", code: "20250301", category: "honorarium", vat: "0%", income: 80, expense: 0 },
-            { nr: 10, date: "4-4", post: "WAMV", code: "WA202503", category: "honorarium", vat: "0%", income: 536.25, expense: 0 },
-            { nr: 11, date: "4-4", post: "T2 Centrum voor Muziek V.O.F.", code: "T2202503", category: "honorarium", vat: "0%", income: 280.93, expense: 0 },
-        ];
-        setBookings(dummy);
+        const fetchData = async () => {
+            try {
+                const [expensesRes, invoicesRes] = await Promise.all([
+                    axios.get(`${import.meta.env.VITE_API_URL}/expenses`),
+                    axios.get(`${import.meta.env.VITE_API_URL}/invoices`),
+                ]);
+
+                const expenses = expensesRes.data.map((e, index) => ({
+                    nr: index + 1,
+                    date: new Date(e.date).toLocaleDateString("nl-NL", { day: '2-digit', month: '2-digit' }),
+                    post: e.vendor,
+                    code: e.invoiceNumber,
+                    category: e.category,
+                    vat: `${e.vat.toFixed(2)}%`,
+                    income: 0,
+                    expense: parseFloat(e.amount),
+                }));
+
+                const startNr = expenses.length + 1;
+
+                const invoices = invoicesRes.data.flatMap((inv, i) => {
+                    const totalIncl = parseFloat(inv.totalInclVat);
+                    return [{
+                        nr: startNr + i,
+                        date: new Date(inv.invoiceDate).toLocaleDateString("nl-NL", { day: '2-digit', month: '2-digit' }),
+                        post: inv.client.name,
+                        code: inv.invoiceNumber,
+                        category: "honorarium",
+                        vat: "0%", // Pas aan als je btw per lijn wil tonen
+                        income: totalIncl,
+                        expense: 0,
+                    }];
+                });
+
+                const combined = [...expenses, ...invoices];
+                combined.sort((a, b) => a.date - b.date); // Sorteren op nummer (of pas aan op datum)
+
+                setBookings(combined);
+            } catch (error) {
+                console.error("Fout bij ophalen data:", error);
+            }
+        };
+
+        fetchData();
     }, []);
 
     return (
         <div className={styles.bookingList}>
-            <h2>Boekingslijst</h2>
+            <h3>Boekingslijst</h3>
             <table>
                 <thead>
                 <tr>

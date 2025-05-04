@@ -57,19 +57,20 @@ function CreateInvoiceForm() {
 
     return (
         <div>
+            <h3>Factuur aanmaken</h3>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
-                    <label>Invoice Number</label>
+                    <label>Factuurnummer</label>
                     <input type="text" {...register("invoiceNumber")} />
                 </div>
 
                 <div>
-                    <label>Invoice Date</label>
+                    <label>Factuurdatum</label>
                     <input type="date" {...register("invoiceDate")} />
                 </div>
 
                 <div>
-                    <label>Client</label>
+                    <label>Klant</label>
                     <select {...register("clientId")} required>
                         <option value="">-- Choose client --</option>
                         {clients.map(client => (
@@ -81,34 +82,34 @@ function CreateInvoiceForm() {
                 </div>
 
                 <div>
-                    <label>Invoice Lines</label>
+                    <label>Factuur regels</label>
                     {fields.map((field, index) => (
                         <div key={field.id} className="border p-2 my-2">
                             <input
-                                placeholder="Description"
+                                placeholder="Omschrijving"
                                 {...register(`lines.${index}.description`)}
                                 required
                             />
                             <input
                                 type="date"
-                                placeholder="Date"
+                                placeholder="Datum"
                                 {...register(`lines.${index}.date`)}
                             />
                             <input
                                 type="number"
-                                placeholder="Minutes"
+                                placeholder="Minuten"
                                 {...register(`lines.${index}.durationMinutes`)}
                             />
                             <input
                                 type="number"
                                 step="0.01"
-                                placeholder="Hourly rate"
+                                placeholder="Uurtarief"
                                 {...register(`lines.${index}.hourlyRate`)}
                             />
                             <input
                                 type="number"
                                 step="0.01"
-                                placeholder="Amount (€)"
+                                placeholder="Bedrag (€)"
                                 {...register(`lines.${index}.amount`)}
                                 required
                             />
@@ -120,7 +121,7 @@ function CreateInvoiceForm() {
                     </button>
                 </div>
 
-                <Button type="submit">Create Invoice</Button>
+                <Button type="submit">Genereer factuur</Button>
             </form>
             {createdInvoice && (
                 <div className="mt-4">

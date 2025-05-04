@@ -74,6 +74,12 @@ a:hover, Link:hover {
     color: var(--second-hover-color);
 }
 
+input, select, textarea {
+    border: 1px solid var(--second-hover-color);
+    border-radius: 1rem;
+    padding: 0.1rem 0.2rem;
+}
+
 button {
     border: 1px solid var(--second-color);
     background-color: transparent;

@@ -1,4 +1,22 @@
 .bookingList {
-    border: 1px solid var(--second-color);
-    color: var(--third-color);
+    width: 100%;
+    overflow-x: auto;
+    min-width: 40rem;
+}
+
+.bookingList table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px; /* optioneel, voorkomt dat kolommen te smal worden */
+}
+
+.bookingList th,
+.bookingList td {
+    border: 1px solid var(--third-color);
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.bookingList thead {
+    background-color: var(--second-color);
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import Button from "../../components/button/Button.jsx";
 
 function ClientPage() {
     const [clients, setClients] = useState([]);
@@ -69,25 +70,25 @@ function ClientPage() {
 
     return (
         <div>
-            <h1>{editClientId ? "Edit Client" : "Add Client"}</h1>
+            <h3>{editClientId ? "Klant aanpassen" : "Klant toevoegen"}</h3>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <input {...register("name", { required: true })} placeholder="Name" />
-                <input {...register("contactPerson")} placeholder="Contact Person" />
-                <input {...register("street")} placeholder="Street" />
-                <input {...register("postalCode")} placeholder="Postal Code" />
-                <input {...register("city")} placeholder="City" />
-                <button type="submit">{editClientId ? "Update" : "Add"}</button>
-                {editClientId && <button type="button" onClick={handleCancelEdit}>Cancel</button>}
+                <input {...register("name", { required: true })} placeholder="Naam" />
+                <input {...register("contactPerson")} placeholder="Contactpersoon" />
+                <input {...register("street")} placeholder="Straat" />
+                <input {...register("postalCode")} placeholder="Postcode" />
+                <input {...register("city")} placeholder="Stad" />
+                <Button type="submit">{editClientId ? "Bijwerken" : "Toevoegen"}</Button>
+                {editClientId && <Button type="button" onClick={handleCancelEdit}>Cancel</Button>}
             </form>
 
-            <h2>Client List</h2>
+            <h4>Client List</h4>
             <ul>
                 {clients.map(client => (
                     <li key={client.id}>
                         <strong>{client.name}</strong> ({client.contactPerson}) – {client.city}
-                        <button onClick={() => handleEdit(client)}>Edit</button>
-                        <button onClick={() => handleDelete(client.id)}>Delete</button>
+                        <Button onClick={() => handleEdit(client)}>Bewerk</Button>
+                        <Button onClick={() => handleDelete(client.id)}>Verwijder</Button>
                     </li>
                 ))}
             </ul>

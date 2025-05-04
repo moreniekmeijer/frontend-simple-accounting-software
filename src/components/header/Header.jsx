@@ -4,27 +4,32 @@ import "./Header.modules.css";
 function Header() {
     return (
         <header className="header">
-            <h1>Simple Accounting</h1>
+            <h1>Simpel boekhouden! 🖊️</h1>
             <nav>
                 <ul className="nav-list">
                     <li>
                         <NavLink to="/invoices" className={({ isActive }) => isActive ? "active" : ""}>
-                            Invoices
+                            Inkomsten
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/expenses" className={({ isActive }) => isActive ? "active" : ""}>
+                            uitgaven
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/clients" className={({ isActive }) => isActive ? "active" : ""}>
-                            Clients
+                            Cliënten
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/bookings" className={({ isActive }) => isActive ? "active" : ""}>
-                            Booking List
+                            Boekingslijst
                         </NavLink>
                     </li>
                     <li>
                         <NavLink to="/year-overview" className={({ isActive }) => isActive ? "active" : ""}>
-                            Year Overview
+                            Jaaroverzicht
                         </NavLink>
                     </li>
                 </ul>

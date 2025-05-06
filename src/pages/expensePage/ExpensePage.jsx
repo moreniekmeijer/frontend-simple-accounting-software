@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import DragDrop from "../../components/dragDrop/DragDrop.jsx";
+import Button from "../../components/button/Button.jsx";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/expenses`;
-
-// TODO - /expense wordt nu al opgeslagen voordat de gebruiker de data heeft gecheckt! Dat moet niet
 
 const ExpensePage = () => {
     const [expenses, setExpenses] = useState([]);
     const [selectedExpenseId, setSelectedExpenseId] = useState("");
     const [currentExpenseId, setCurrentExpenseId] = useState(null);
+    const [receiptUrl, setReceiptUrl] = useState("");
+    const [uploadedFile, setUploadedFile] = useState(null);
 
     const dropRef = useRef();
 
@@ -22,7 +23,7 @@ const ExpensePage = () => {
     } = useForm();
 
     useEffect(() => {
-        fetchAllExpenses();
+        void fetchAllExpenses();
     }, []);
 
     const fetchAllExpenses = async () => {
@@ -36,13 +37,16 @@ const ExpensePage = () => {
 
     const handleFileSelect = async (file) => {
         setSelectedExpenseId("");
+        setUploadedFile(file);
         const uploadData = new FormData();
         uploadData.append("file", file);
 
         try {
-            const response = await axios.post(API_URL, uploadData);
-            reset(response.data);
-            setCurrentExpenseId(response.data.id);
+            const response = await axios.post(`${API_URL}/parse`, uploadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            reset(response.data); // parsedReceiptDto
+            setCurrentExpenseId(null); // dit is een NIEUWE bon
         } catch (error) {
             console.error("Fout bij uploaden of OCR:", error);
             alert("Upload of OCR mislukt.");
@@ -55,12 +59,18 @@ const ExpensePage = () => {
 
         if (!id) {
             reset();
+            setReceiptUrl("");  // Als er geen selectie is, reset de afbeelding
             return;
         }
 
         try {
             const response = await axios.get(`${API_URL}/${id}`);
             reset(response.data);
+
+            // Haal de bonafbeelding op van de backend
+            const receiptResponse = await axios.get(`${API_URL}/${id}/receipt`, { responseType: 'blob' });
+            const imageUrl = URL.createObjectURL(receiptResponse.data);  // Zet de blob om naar een URL
+            setReceiptUrl(imageUrl);
         } catch (error) {
             console.error("Fout bij ophalen bon:", error);
             alert("Bon niet gevonden.");
@@ -68,18 +78,40 @@ const ExpensePage = () => {
     };
 
     const onSubmit = async (data) => {
-        if (!currentExpenseId) {
-            alert("Geen bon geselecteerd of geüpload.");
+        if (!uploadedFile) {
+            alert("Geen bestand geselecteerd.");
             return;
         }
 
+        const formData = new FormData();
+        formData.append("expense", new Blob([JSON.stringify(data)], { type: "application/json" }));
+        formData.append("file", uploadedFile);
+
         try {
-            await axios.put(`${API_URL}/${currentExpenseId}`, data);
-            alert("Bon succesvol bijgewerkt.");
-            fetchAllExpenses();
+            const response = await axios.post(API_URL, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            alert("Bon succesvol opgeslagen.");
+            reset();
+            setUploadedFile(null);
+            void fetchAllExpenses();
         } catch (error) {
-            console.error("Fout bij bijwerken:", error);
-            alert("Bijwerken mislukt.");
+            console.error("Fout bij opslaan:", error);
+            alert("Opslaan mislukt.");
+        }
+    };
+
+    const handleDownload = async () => {
+        if (!currentExpenseId) return;
+        try {
+            const response = await axios.get(`${API_URL}/${currentExpenseId}/receipt`, { responseType: 'blob' });
+            const file = new Blob([response.data], { type: 'application/pdf' }); // of een andere mime type
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(file);
+            link.download = 'receipt.pdf';  // Pas naam aan indien nodig
+            link.click();
+        } catch (error) {
+            console.error("Fout bij downloaden bon:", error);
         }
     };
 
@@ -106,6 +138,14 @@ const ExpensePage = () => {
                     ))}
                 </select>
             </div>
+
+            {receiptUrl && (
+                <div>
+                    <h4>Bonafbeelding</h4>
+                    <img src={receiptUrl} alt="Receipt" style={{ maxWidth: '300px', maxHeight: '300px' }} />
+                    <Button onClick={handleDownload}>Download bon</Button>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
@@ -158,7 +198,7 @@ const ExpensePage = () => {
                     />
                 </div>
 
-                <button type="submit">Bijwerken</button>
+                <Button type="submit">Bijwerken</Button>
             </form>
         </div>
     );

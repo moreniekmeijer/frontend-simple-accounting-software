@@ -1,50 +1,149 @@
+import styles from './YearOverviewPage.module.css';
+import {useEffect, useState} from "react";
+import axios from "axios";
+import {calculateTax} from "../../helpers/calculateTax.js";
+
 function YearOverviewPage() {
+    const [expenses, setExpenses] = useState([]);
+    const [invoices, setInvoices] = useState([]);
+    const [otherIncome, setOtherIncome] = useState(0);
+
+    const handleOtherIncomeChange = (e) => {
+        setOtherIncome(Number(e.target.value));
+    };
+
+    const formatCurrency = (value) => {
+        return value.toLocaleString('nl-NL', {
+            style: 'currency',
+            currency: 'EUR',
+            minimumFractionDigits: 2
+        });
+    };
+
+    const sum = (arr) => arr.reduce((acc, val) => acc + val, 0);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [expensesRes, invoicesRes] = await Promise.all([
+                    axios.get(`${import.meta.env.VITE_API_URL}/expenses`),
+                    axios.get(`${import.meta.env.VITE_API_URL}/invoices`),
+                ]);
+
+                setExpenses(expensesRes.data);
+                setInvoices(invoicesRes.data);
+            } catch (e) {
+                console.error("Fout bij ophalen data:", e);
+            }
+        };
+
+        void fetchData();
+    }, []);
+
+    // Inkomsten
+    const incomeGross = sum(invoices.map(inv => inv.totalInclVat || 0));
+    const incomeNet = sum(invoices.map(inv => inv.totalExclVat || 0));
+    const avgIncomePerMonth = incomeGross / 12;
+
+    // Uitgaven
+    const expenseGross = sum(expenses.map(e => e.amount));
+    const expenseNet = sum(expenses.map(e => e.amount / (1 + (e.vat || 0))));
+    const avgExpensePerMonth = expenseGross / 12;
+
+    // Winst
+    const profitGross = (incomeGross - expenseGross).toFixed(2);
+    const profitNet = (incomeNet - expenseNet).toFixed(2);
+    const avgProfitPerMonth = profitNet / 12;
+
+    // Categorisatie uitgaven
+    const expenseByCategory = expenses.reduce((acc, e) => {
+        acc[e.category] = (acc[e.category] || 0) + e.amount;
+        return acc;
+    }, {});
+
+    const selfEmployedDeduction = 3750;
+    const starterDeduction = 0;
+
+    const profitBeforeDeductions = profitNet; // profitNet
+    const profitAfterDeductions = profitBeforeDeductions - selfEmployedDeduction - starterDeduction;
+
+    const mkbRelief = profitAfterDeductions * 0.1331;
+    const taxableProfit = profitAfterDeductions - mkbRelief;
+
+    const belastinggrondslag = taxableProfit + otherIncome;
+    const arbeidsinkomen = profitAfterDeductions + otherIncome;
+
+    const tax = calculateTax({
+        belastinggrondslag,
+        winstUitOnderneming: taxableProfit,
+        arbeidsinkomen
+    });
+
     return (
-        <div className="year-overview">
+        <div>
             <h2>Jaaroverzicht 2025</h2>
+            <div className={styles.overviewContainer}>
+                <section className={styles.totalContainer}>
+                    <section>
+                        <h4>Inkomsten</h4>
+                        <p>Bruto: {formatCurrency(incomeGross)}</p>
+                        <p>Netto: {formatCurrency(incomeNet)}</p>
+                        <p>Gemiddeld per maand: {formatCurrency(avgIncomePerMonth)}</p>
+                    </section>
+                    <section>
+                        <h4>Uitgaven</h4>
+                        <p>Bruto: {formatCurrency(expenseGross)}</p>
+                        <p>Netto: {formatCurrency(expenseNet)}</p>
+                        <p>Gemiddeld per maand: {formatCurrency(avgExpensePerMonth)}</p>
+                    </section>
+                    <section>
+                        <h4>Winst/verlies</h4>
+                        <p>Bruto: {profitGross}</p>
+                        <p>Netto: {profitNet}</p>
+                        <p>Gemiddeld per maand: {avgProfitPerMonth.toFixed(2)}</p>
+                    </section>
+                </section>
 
-            <section>
-                <h3>Inkomsten</h3>
-                <p>Bruto: € 3.139</p>
-                <p>Netto: € 3.102</p>
-                <p>Gemiddeld per maand: € 50</p>
-            </section>
+                <section>
+                    <h4>Uitgavenposten</h4>
+                    <ul>
+                        {Object.entries(expenseByCategory).map(([category, total]) => (
+                            <li key={category}>{category}: {formatCurrency(total)}</li>
+                        ))}
+                    </ul>
 
-            <section>
-                <h3>Uitgaven</h3>
-                <p>Bruto: € 285</p>
-                <p>Netto: € 285</p>
-                <p>Gemiddeld per maand: € 57</p>
-                <p>Investeringen: € 285</p>
-            </section>
+                </section>
 
-            <section>
-                <h3>Winst / Verlies</h3>
-                <p>Winst vóór ondernemersaftrek: -€ 35</p>
-                <p>Zelfstandigenaftrek: € 5.030</p>
-                <p>MKB-vrijstelling: -€ 709</p>
-                <p><strong>Winst uit onderneming: -€ 4.356</strong></p>
-            </section>
+                <section>
+                    <h4>aftrekposten</h4>
+                    <p>Winst vóór ondernemersaftrek: {formatCurrency(profitBeforeDeductions)}</p>
+                    <p>Zelfstandigenaftrek: {formatCurrency(selfEmployedDeduction)}</p>
+                    <p>Startersaftrek: {formatCurrency(starterDeduction)}</p>
+                    <p>MKB-winstvrijstelling (13.31%): {formatCurrency(mkbRelief)}</p>
+                    <p><strong>Winst na zelfstandigenaftrek (belastbare winst): {formatCurrency(taxableProfit)}</strong>
+                    </p>
+                </section>
 
-            <section>
-                <h3>Belasting</h3>
-                <p>Belastbaar inkomen: € 0</p>
-                <p>Schijf 1: € 58</p>
-                <p>Totale heffingskortingen: € 2.488</p>
-                <p>Premies volksverzekeringen: € 178</p>
-                <p>Inkomstenbelasting: € 0</p>
-                <p>Zorgverzekering (bijtelling): -€ 248</p>
-                <p><strong>Totaal inkomen: € 7.854</strong></p>
-            </section>
+                <label>
+                    Overige inkomsten (loondienst, etc):
+                    <input
+                        type="number"
+                        value={otherIncome}
+                        onChange={handleOtherIncomeChange}
+                        step="100"
+                    />
+                </label>
 
-            <section>
-                <h3>Overige</h3>
-                <p>Vrijgestelde omzet: € 3.139,04</p>
-                <p>Belaste omzet: € 0</p>
-                <p>Verhouding belast/onbelast: 0%</p>
-                <p>Vooruit ontvangen: € 0</p>
-                <p>Kantoorvergoeding: € 5.000</p>
-            </section>
+                <section>
+                    <h4>Belastingen</h4>
+                    <p>Belastbaar inkomen: {formatCurrency(tax.belastinggrondslag)}</p>
+                    <p>Inkomstenbelasting (box 1): {formatCurrency(tax.inkomstenbelasting)}</p>
+                    <p>Algemene heffingskorting: -{formatCurrency(tax.algemeneHeffingskorting)}</p>
+                    <p>Arbeidskorting: -{formatCurrency(tax.arbeidskorting)}</p>
+                    <p>Zvw-bijdrage: +{formatCurrency(tax.zvwBijdrage)}</p>
+                    <p><strong>Totaal te betalen: {formatCurrency(tax.totaalBelasting)}</strong></p>
+                </section>
+            </div>
         </div>
     );
 }

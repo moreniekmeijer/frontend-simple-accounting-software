@@ -79,7 +79,7 @@ function ClientPage() {
                 <input {...register("postalCode")} placeholder="Postcode" />
                 <input {...register("city")} placeholder="Stad" />
                 <Button type="submit">{editClientId ? "Bijwerken" : "Toevoegen"}</Button>
-                {editClientId && <Button type="button" onClick={handleCancelEdit}>Cancel</Button>}
+                {editClientId && <Button type="button" variant="simple" onClick={handleCancelEdit}>Cancel</Button>}
             </form>
 
             <h4>Client List</h4>
@@ -87,8 +87,8 @@ function ClientPage() {
                 {clients.map(client => (
                     <li key={client.id}>
                         <strong>{client.name}</strong> ({client.contactPerson}) – {client.city}
-                        <Button onClick={() => handleEdit(client)}>Bewerk</Button>
-                        <Button onClick={() => handleDelete(client.id)}>Verwijder</Button>
+                        <Button variant="simple" onClick={() => handleEdit(client)}>Bewerk</Button>
+                        <Button variant="simple" onClick={() => handleDelete(client.id)}>Verwijder</Button>
                     </li>
                 ))}
             </ul>

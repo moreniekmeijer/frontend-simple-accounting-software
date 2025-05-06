@@ -1,7 +1,10 @@
 header {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
     padding-bottom: 1rem;
+    margin-bottom: 1rem;
     align-items: center;
     border-bottom: 1px solid var(--third-color);
 }

@@ -72,7 +72,7 @@ function CreateInvoiceForm() {
                 <div>
                     <label>Klant</label>
                     <select {...register("clientId")} required>
-                        <option value="">-- Choose client --</option>
+                        <option value="">-- Kies klant --</option>
                         {clients.map(client => (
                             <option key={client.id} value={client.id}>
                                 {client.name} ({client.contactPerson})
@@ -113,12 +113,12 @@ function CreateInvoiceForm() {
                                 {...register(`lines.${index}.amount`)}
                                 required
                             />
-                            <button type="button" onClick={() => remove(index)}>Remove</button>
+                            <Button type="button" variant="simple" onClick={() => remove(index)}>Verwijder</Button>
                         </div>
                     ))}
-                    <button type="button" onClick={() => append({description: "", amount: ""})}>
-                        + Add Line
-                    </button>
+                    <Button type="button" variant="simple" onClick={() => append({description: "", amount: ""})}>
+                        + Regel toevoegen
+                    </Button>
                 </div>
 
                 <Button type="submit">Genereer factuur</Button>

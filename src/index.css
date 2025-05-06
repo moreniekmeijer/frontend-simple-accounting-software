@@ -79,20 +79,3 @@ input, select, textarea {
     border-radius: 1rem;
     padding: 0.1rem 0.2rem;
 }
-
-button {
-    border: 1px solid var(--second-color);
-    background-color: transparent;
-    margin: 0.4rem;
-    padding: 0.5rem 0.5rem;
-    border-radius: 0.2rem;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: var(--second-hover-color);
-}
-
-button:active {
-    background-color: var(--second-accent-color);
-}

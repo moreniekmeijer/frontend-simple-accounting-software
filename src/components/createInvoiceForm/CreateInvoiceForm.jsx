@@ -54,6 +54,15 @@ function CreateInvoiceForm() {
         }
     };
 
+    const handleOpenClick = () => {
+        const driveUrl = createdInvoice.driveUrl;
+
+        if (driveUrl) {
+            window.open(driveUrl, '_blank', 'noopener,noreferrer');
+        } else {
+            alert("De PDF-link is niet beschikbaar.");
+        }
+    };
 
     return (
         <div>
@@ -124,16 +133,13 @@ function CreateInvoiceForm() {
                 <Button type="submit">Genereer factuur</Button>
             </form>
             {createdInvoice && (
-                <div className="mt-4">
+                <div>
                     <p><strong>Factuurnummer:</strong> {createdInvoice.invoiceNumber}</p>
-                    <a
-                        href={`${import.meta.env.VITE_API_URL}/invoices/${createdInvoice.id}/pdf`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline mt-2 inline-block"
+                    <Button
+                        onClick={handleOpenClick}
                     >
-                        Download PDF
-                    </a>
+                        Open PDF
+                    </Button>
                 </div>
             )}
         </div>

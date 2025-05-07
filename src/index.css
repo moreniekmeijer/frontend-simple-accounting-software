@@ -13,9 +13,9 @@
 
     --background-color: #e9f0ff;
     --text-color-dark: #071113;
-    --first-color: #acd1bd;
-    --first-accent-color: #73efb7;
-    --first-hover-color: #bce4cf;
+    --first-color: #2a9c5f;
+    --first-accent-color: #1a7149;
+    --first-hover-color: #7ce8ad;
     --second-color: #ad9aea;
     --second-hover-color: #bbb6e4;
     --second-accent-color: #8265ea;
@@ -66,12 +66,12 @@ ul {
 
 a, Link {
     text-decoration: none;
-    color: var(--third-color);
+    color: var(--first-color);
     cursor: pointer;
 }
 
 a:hover, Link:hover {
-    color: var(--second-hover-color);
+    color: var(--first-hover-color);
 }
 
 input, select, textarea {

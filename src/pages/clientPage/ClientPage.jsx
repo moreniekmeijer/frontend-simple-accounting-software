@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import {useEffect, useState} from "react";
+import {useForm} from "react-hook-form";
 import axios from "axios";
 import Button from "../../components/button/Button.jsx";
 
@@ -7,7 +7,7 @@ function ClientPage() {
     const [clients, setClients] = useState([]);
     const [editClientId, setEditClientId] = useState(null);
 
-    const { register, handleSubmit, reset, setValue } = useForm({
+    const {register, handleSubmit, reset, setValue} = useForm({
         defaultValues: {
             name: "",
             contactPerson: "",
@@ -73,13 +73,15 @@ function ClientPage() {
             <h3>{editClientId ? "Klant aanpassen" : "Klant toevoegen"}</h3>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <input {...register("name", { required: true })} placeholder="Naam" />
-                <input {...register("contactPerson")} placeholder="Contactpersoon" />
-                <input {...register("street")} placeholder="Straat" />
-                <input {...register("postalCode")} placeholder="Postcode" />
-                <input {...register("city")} placeholder="Stad" />
-                <Button type="submit">{editClientId ? "Bijwerken" : "Toevoegen"}</Button>
-                {editClientId && <Button type="button" variant="simple" onClick={handleCancelEdit}>Cancel</Button>}
+                <fieldset>
+                    <input {...register("name", {required: true})} placeholder="Naam"/>
+                    <input {...register("contactPerson")} placeholder="Contactpersoon"/>
+                    <input {...register("street")} placeholder="Straat"/>
+                    <input {...register("postalCode")} placeholder="Postcode"/>
+                    <input {...register("city")} placeholder="Stad"/>
+                    <Button type="submit">{editClientId ? "Bijwerken" : "Toevoegen"}</Button>
+                    {editClientId && <Button type="button" variant="simple" onClick={handleCancelEdit}>Cancel</Button>}
+                </fieldset>
             </form>
 
             <h4>Client List</h4>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import axios from "axios";
-import { useForm } from "react-hook-form";
+import {useForm} from "react-hook-form";
 import DragDrop from "../../components/dragDrop/DragDrop.jsx";
 import Button from "../../components/button/Button.jsx";
 
@@ -12,19 +12,34 @@ const ExpensePage = () => {
     const [currentExpenseId, setCurrentExpenseId] = useState(null);
     const [receiptUrl, setReceiptUrl] = useState("");
     const [uploadedFile, setUploadedFile] = useState(null);
-
+    const [isInvestment, setIsInvestment] = useState(null);
     const dropRef = useRef();
 
     const {
         register,
         handleSubmit,
         reset,
-        formState: { errors }
+        setValue,
+        watch,
+        formState: {errors}
     } = useForm();
+
+    const amountValue = watch("amount");
 
     useEffect(() => {
         void fetchAllExpenses();
     }, []);
+
+    useEffect(() => {
+        const parsedAmount = parseFloat(amountValue);
+        if (!isNaN(parsedAmount) && parsedAmount > 450) {
+            setIsInvestment(true);
+            setValue("category", "investering");
+        } else {
+            setIsInvestment(false);
+            setValue("category", "");
+        }
+    }, [amountValue, setValue]);
 
     const fetchAllExpenses = async () => {
         try {
@@ -43,10 +58,10 @@ const ExpensePage = () => {
 
         try {
             const response = await axios.post(`${API_URL}/parse`, uploadData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: {'Content-Type': 'multipart/form-data'}
             });
-            reset(response.data); // parsedReceiptDto
-            setCurrentExpenseId(null); // dit is een NIEUWE bon
+            reset(response.data);
+            setCurrentExpenseId(null);
         } catch (error) {
             console.error("Fout bij uploaden of OCR:", error);
             alert("Upload of OCR mislukt.");
@@ -59,7 +74,7 @@ const ExpensePage = () => {
 
         if (!id) {
             reset();
-            setReceiptUrl("");  // Als er geen selectie is, reset de afbeelding
+            setReceiptUrl("");
             return;
         }
 
@@ -67,8 +82,7 @@ const ExpensePage = () => {
             const response = await axios.get(`${API_URL}/${id}`);
             reset(response.data);
 
-            // Haal de bonafbeelding op van de backend
-            const receiptResponse = await axios.get(`${API_URL}/${id}/receipt`, { responseType: 'blob' });
+            const receiptResponse = await axios.get(`${API_URL}/${id}/receipt`, {responseType: 'blob'});
             const imageUrl = URL.createObjectURL(receiptResponse.data);  // Zet de blob om naar een URL
             setReceiptUrl(imageUrl);
         } catch (error) {
@@ -84,13 +98,21 @@ const ExpensePage = () => {
         }
 
         const formData = new FormData();
-        formData.append("expense", new Blob([JSON.stringify(data)], { type: "application/json" }));
+        formData.append("expense", new Blob([JSON.stringify(data)], {type: "application/json"}));
         formData.append("file", uploadedFile);
 
+        // Dummy investment data; backend beslist zelf of investering nodig is
+        const investmentData = {
+            depreciationYears: 5,
+            residualValue: 0
+        };
+        formData.append("investment", new Blob([JSON.stringify(investmentData)], {type: "application/json"}));
+
         try {
-            const response = await axios.post(API_URL, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
+            await axios.post(API_URL, formData, {
+                headers: {"Content-Type": "multipart/form-data"}
             });
+
             alert("Bon succesvol opgeslagen.");
             reset();
             setUploadedFile(null);
@@ -104,11 +126,13 @@ const ExpensePage = () => {
     const handleDownload = async () => {
         if (!currentExpenseId) return;
         try {
-            const response = await axios.get(`${API_URL}/${currentExpenseId}/receipt`, { responseType: 'blob' });
-            const file = new Blob([response.data], { type: 'application/pdf' }); // of een andere mime type
+            const response = await axios.get(`${API_URL}/${currentExpenseId}/receipt`, {
+                responseType: 'blob'
+            });
+            const file = new Blob([response.data], {type: 'application/pdf'});
             const link = document.createElement('a');
             link.href = URL.createObjectURL(file);
-            link.download = 'receipt.pdf';  // Pas naam aan indien nodig
+            link.download = 'receipt.pdf';
             link.click();
         } catch (error) {
             console.error("Fout bij downloaden bon:", error);
@@ -119,9 +143,10 @@ const ExpensePage = () => {
         <div>
             <h3>Uitgave toevoegen of bewerken</h3>
 
+            <fieldset>
             <div>
                 <label>Sleep je bon hierheen of klik:</label>
-                <DragDrop ref={dropRef} onFileSelect={handleFileSelect} />
+                <DragDrop ref={dropRef} onFileSelect={handleFileSelect}/>
             </div>
 
             <div>
@@ -142,61 +167,102 @@ const ExpensePage = () => {
             {receiptUrl && (
                 <div>
                     <h4>Bonafbeelding</h4>
-                    <img src={receiptUrl} alt="Receipt" style={{ maxWidth: '300px', maxHeight: '300px' }} />
+                    <img src={receiptUrl} alt="Receipt" style={{maxWidth: '300px', maxHeight: '300px'}}/>
                     <Button onClick={handleDownload}>Download bon</Button>
                 </div>
             )}
+            </fieldset>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <label>Factuurnummer</label>
-                    <input
-                        type="text"
-                        {...register("invoiceNumber", { required: "Verplicht veld" })}
-                    />
-                    {errors.invoiceNumber && <p>{errors.invoiceNumber.message}</p>}
-                </div>
+                <fieldset>
+                    <div>
+                        <label>Factuurnummer</label>
+                        <input
+                            type="text"
+                            {...register("invoiceNumber", {required: "Verplicht veld"})}
+                        />
+                        {errors.invoiceNumber && <p>{errors.invoiceNumber.message}</p>}
+                    </div>
 
-                <div>
-                    <label>Datum</label>
-                    <input
-                        type="date"
-                        {...register("date", { required: "Datum is verplicht" })}
-                    />
-                    {errors.date && <p>{errors.date.message}</p>}
-                </div>
+                    <div>
+                        <label>Datum</label>
+                        <input
+                            type="date"
+                            {...register("date", {required: "Datum is verplicht"})}
+                        />
+                        {errors.date && <p>{errors.date.message}</p>}
+                    </div>
 
-                <div>
-                    <label>Bedrag</label>
-                    <input
-                        type="text"
-                        {...register("amount", {
-                            required: "Bedrag is verplicht",
-                            validate: val => !isNaN(val) || "Moet een getal zijn"
-                        })}
-                    />
-                    {errors.amount && <p>{errors.amount.message}</p>}
-                </div>
+                    <div>
+                        <label>Bedrijf</label>
+                        <input
+                            type="vendor"
+                            {...register("vendor", {required: "Bedrijf is verplicht"})}
+                        />
+                        {errors.date && <p>{errors.date.message}</p>}
+                    </div>
 
-                <div>
-                    <label>BTW</label>
-                    <input
-                        type="text"
-                        {...register("vat", {
-                            required: "BTW is verplicht",
-                            validate: val => !isNaN(val) || "Moet een getal zijn"
-                        })}
-                    />
-                    {errors.vat && <p>{errors.vat.message}</p>}
-                </div>
+                    <div>
+                        <label>Bedrag</label>
+                        <input
+                            type="text"
+                            {...register("amount", {
+                                required: "Bedrag is verplicht",
+                                validate: val => !isNaN(val) || "Moet een getal zijn"
+                            })}
+                        />
+                        {errors.amount && <p>{errors.amount.message}</p>}
+                    </div>
 
-                <div>
-                    <label>Categorie</label>
-                    <input
-                        type="text"
-                        {...register("category")}
-                    />
-                </div>
+                    <div>
+                        <label>BTW</label>
+                        <input
+                            type="text"
+                            {...register("vat", {
+                                required: "BTW is verplicht",
+                                validate: val => !isNaN(val) || "Moet een getal zijn"
+                            })}
+                            defaultValue="0.21"
+                        />
+                        {errors.vat && <p>{errors.vat.message}</p>}
+                    </div>
+
+                    <div>
+                        <label>Categorie</label>
+                        <input
+                            type="text"
+                            {...register("category")}
+                            disabled={isInvestment}
+                        />
+                    </div>
+                </fieldset>
+
+                {isInvestment && (
+                    <fieldset>
+                        <label>Afschrijvingsduur (jaren)</label>
+                        <input
+                            type="number"
+                            {...register("depreciationYears", {
+                                required: "Verplicht bij investeringen",
+                                min: {value: 5, message: "Minimaal 5 jaar"}
+                            })}
+                            defaultValue="5"
+                        />
+                        {errors.depreciationYears && <p>{errors.depreciationYears.message}</p>}
+
+                        <label>Restwaarde (€)</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            {...register("residualValue", {
+                                required: "Verplicht bij investeringen",
+                                min: {value: 0, message: "Kan niet negatief zijn"}
+                            })}
+                            defaultValue="0"
+                        />
+                        {errors.residualValue && <p>{errors.residualValue.message}</p>}
+                    </fieldset>
+                )}
 
                 <Button type="submit">Bijwerken</Button>
             </form>

@@ -68,17 +68,21 @@ function CreateInvoiceForm() {
         <div>
             <h3>Factuur aanmaken</h3>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
+                <fieldset>
                     <label>Factuurnummer</label>
-                    <input type="text" {...register("invoiceNumber")} />
-                </div>
+                    <input
+                        type="text"
+                        {...register("invoiceNumber")}
+                        placeholder="Laat leeg voor automatisch aanmaken"
+                    />
 
-                <div>
                     <label>Factuurdatum</label>
-                    <input type="date" {...register("invoiceDate")} />
-                </div>
+                    <input
+                        type="date"
+                        {...register("invoiceDate")}
+                        defaultValue={Date.now()}
+                    />
 
-                <div>
                     <label>Klant</label>
                     <select {...register("clientId")} required>
                         <option value="">-- Kies klant --</option>
@@ -88,9 +92,9 @@ function CreateInvoiceForm() {
                             </option>
                         ))}
                     </select>
-                </div>
+                </fieldset>
 
-                <div>
+                <fieldset>
                     <label>Factuur regels</label>
                     {fields.map((field, index) => (
                         <div key={field.id} className="border p-2 my-2">
@@ -128,7 +132,7 @@ function CreateInvoiceForm() {
                     <Button type="button" variant="simple" onClick={() => append({description: "", amount: ""})}>
                         + Regel toevoegen
                     </Button>
-                </div>
+                </fieldset>
 
                 <Button type="submit">Genereer factuur</Button>
             </form>

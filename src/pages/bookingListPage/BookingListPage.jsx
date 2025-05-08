@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
 import styles from "./BookingListPage.module.css";
 import Button from "../../components/button/Button.jsx";
@@ -17,13 +17,13 @@ function BookingListPage() {
                 id: e.id,
                 type: "expense",
                 nr: index + 1,
-                date: new Date(e.date).toLocaleDateString("nl-NL", { day: '2-digit', month: '2-digit' }),
+                date: new Date(e.date).toLocaleDateString("nl-NL", {day: '2-digit', month: '2-digit'}),
                 post: e.vendor,
                 code: e.invoiceNumber,
                 category: e.category,
                 vat: `${e.vat.toFixed(2)}%`,
                 income: 0,
-                expense: parseFloat(e.amount),
+                expense: (e.category === "investment") ? "iets" : parseFloat(e.amount),
             }));
 
             const startNr = expenses.length + 1;
@@ -34,7 +34,7 @@ function BookingListPage() {
                     id: inv.id,
                     type: "invoice",
                     nr: startNr + i,
-                    date: new Date(inv.invoiceDate).toLocaleDateString("nl-NL", { day: '2-digit', month: '2-digit' }),
+                    date: new Date(inv.invoiceDate).toLocaleDateString("nl-NL", {day: '2-digit', month: '2-digit'}),
                     post: inv.client.name,
                     code: inv.invoiceNumber,
                     category: "honorarium",
@@ -69,6 +69,8 @@ function BookingListPage() {
             alert("Verwijderen mislukt. Probeer het opnieuw.");
         }
     };
+
+    // TODO - bookings uit investments amount from investmentDetails.bookValue
 
     return (
         <div className={styles.bookingList}>

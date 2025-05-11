@@ -1,52 +1,62 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./BookingListPage.module.css";
 import Button from "../../components/button/Button.jsx";
+import {useYear} from "../../contexts/YearContext.jsx";
 
 function BookingListPage() {
     const [bookings, setBookings] = useState([]);
+    const { selectedYear, setSelectedYear } = useYear();
+    const [availableYears, setAvailableYears] = useState([]);
 
     const fetchData = async () => {
         try {
             const [expensesRes, invoicesRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_URL}/expenses`),
-                axios.get(`${import.meta.env.VITE_API_URL}/invoices`),
+                axios.get(`${import.meta.env.VITE_API_URL}/expenses`, { params: { year: selectedYear } }),
+                axios.get(`${import.meta.env.VITE_API_URL}/invoices`, { params: { year: selectedYear } }),
             ]);
 
-            const expenses = expensesRes.data.map((e, index) => ({
-                id: e.id,
-                type: "expense",
-                nr: index + 1,
-                date: new Date(e.date).toLocaleDateString("nl-NL", {day: '2-digit', month: '2-digit'}),
-                post: e.vendor,
-                code: e.invoiceNumber,
-                category: e.category,
-                vat: `${e.vat.toFixed(2)}%`,
-                income: 0,
-                expense: (e.category === "investment") ? "iets" : parseFloat(e.amount),
-            }));
+            const expenses = expensesRes.data
+                .filter(e => !e.investmentDetails || e.investmentDetails.bookValue > 0)
+                .map((e, index) => {
+                    const dateObj = new Date(e.date);
+                    return {
+                        id: e.id,
+                        type: "expense",
+                        nr: index + 1,
+                        date: dateObj.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit" }),
+                        rawDate: dateObj,
+                        post: e.vendor,
+                        code: e.invoiceNumber,
+                        category: e.category,
+                        vat: `${e.vat.toFixed(2)}%`,
+                        income: 0,
+                        expense: e.category === "investering" && e.investmentDetails
+                            ? parseFloat(e.investmentDetails.annualDepreciation)
+                            : parseFloat(e.amount),
+                    };
+                });
 
             const startNr = expenses.length + 1;
 
-            const invoices = invoicesRes.data.flatMap((inv, i) => {
-                const totalIncl = parseFloat(inv.totalInclVat);
-                return [{
+            const invoices = invoicesRes.data.map((inv, i) => {
+                const dateObj = new Date(inv.invoiceDate);
+                return {
                     id: inv.id,
                     type: "invoice",
                     nr: startNr + i,
-                    date: new Date(inv.invoiceDate).toLocaleDateString("nl-NL", {day: '2-digit', month: '2-digit'}),
+                    date: dateObj.toLocaleDateString("nl-NL", { day: "2-digit", month: "2-digit" }),
+                    rawDate: dateObj,
                     post: inv.client.name,
                     code: inv.invoiceNumber,
                     category: "honorarium",
                     vat: "0%",
-                    income: totalIncl,
+                    income: parseFloat(inv.totalInclVat),
                     expense: 0,
-                }];
+                };
             });
 
-            const combined = [...expenses, ...invoices];
-            combined.sort((a, b) => a.nr - b.nr); // Je sorteert nu op volgnummer
-
+            const combined = [...expenses, ...invoices].sort((a, b) => a.nr - b.nr);
             setBookings(combined);
         } catch (error) {
             console.error("Fout bij ophalen data:", error);
@@ -54,8 +64,15 @@ function BookingListPage() {
     };
 
     useEffect(() => {
-        void fetchData();
+        const now = new Date().getFullYear();
+        const years = Array.from({ length: 10 }, (_, i) => now - i);
+        setAvailableYears(years);
+        setSelectedYear(prev => years.includes(prev) ? prev : now);
     }, []);
+
+    useEffect(() => {
+        void fetchData();
+    }, [selectedYear]);
 
     const handleDelete = async (id, type) => {
         const endpoint = `${import.meta.env.VITE_API_URL}/${type}s/${id}`;
@@ -70,11 +87,25 @@ function BookingListPage() {
         }
     };
 
-    // TODO - bookings uit investments amount from investmentDetails.bookValue
-
     return (
         <div className={styles.bookingList}>
             <h3>Boekingslijst</h3>
+
+            <div style={{ marginBottom: "1rem" }}>
+                <label htmlFor="year-select">Selecteer jaar: </label>
+                <select
+                    id="year-select"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                >
+                    {availableYears.map((year) => (
+                        <option key={year} value={year}>
+                            {year}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <table>
                 <thead>
                 <tr>

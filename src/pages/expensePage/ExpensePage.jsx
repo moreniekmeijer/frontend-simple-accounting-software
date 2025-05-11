@@ -63,8 +63,8 @@ const ExpensePage = () => {
             reset(response.data);
             setCurrentExpenseId(null);
         } catch (error) {
-            console.error("Fout bij uploaden of OCR:", error);
-            alert("Upload of OCR mislukt.");
+            console.error("Fout bij uploaden OCR:", error);
+            alert("Upload van OCR mislukt.");
         }
     };
 
@@ -101,12 +101,13 @@ const ExpensePage = () => {
         formData.append("expense", new Blob([JSON.stringify(data)], {type: "application/json"}));
         formData.append("file", uploadedFile);
 
-        // Dummy investment data; backend beslist zelf of investering nodig is
-        const investmentData = {
-            depreciationYears: 5,
-            residualValue: 0
-        };
-        formData.append("investment", new Blob([JSON.stringify(investmentData)], {type: "application/json"}));
+        if (isInvestment) {
+            const investmentData = {
+                depreciationYears: data.depreciationYears,
+                residualValue: data.residualValue
+            };
+            formData.append("investment", new Blob([JSON.stringify(investmentData)], { type: "application/json" }));
+        }
 
         try {
             await axios.post(API_URL, formData, {

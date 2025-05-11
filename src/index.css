@@ -78,7 +78,6 @@ input, select, textarea {
     border: 1px solid var(--second-hover-color);
     border-radius: 1rem;
     padding: 0.1rem 0.2rem;
-    min-width: 100%;
 }
 
 form {
@@ -90,10 +89,10 @@ form {
 fieldset {
     display: flex;
     flex-direction: column;
-    max-width: 50rem;
+    align-items: center;
+    max-width: 60rem;
     gap: 1rem;
     border: 1px solid var(--second-color);
     border-radius: 1rem;
     padding: 1rem;
-    align-items: center;
 }

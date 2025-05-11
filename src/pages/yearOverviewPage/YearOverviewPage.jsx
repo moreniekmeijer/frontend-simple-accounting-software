@@ -2,11 +2,13 @@ import styles from './YearOverviewPage.module.css';
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {calculateTax} from "../../helpers/calculateTax.js";
+import {useYear} from "../../contexts/YearContext.jsx";
 
 function YearOverviewPage() {
     const [expenses, setExpenses] = useState([]);
     const [invoices, setInvoices] = useState([]);
     const [otherIncome, setOtherIncome] = useState(0);
+    const { selectedYear } = useYear();
 
     const handleOtherIncomeChange = (e) => {
         setOtherIncome(Number(e.target.value));
@@ -26,8 +28,8 @@ function YearOverviewPage() {
         const fetchData = async () => {
             try {
                 const [expensesRes, invoicesRes] = await Promise.all([
-                    axios.get(`${import.meta.env.VITE_API_URL}/expenses`),
-                    axios.get(`${import.meta.env.VITE_API_URL}/invoices`),
+                    axios.get(`${import.meta.env.VITE_API_URL}/expenses`, { params: { year: selectedYear } }),
+                    axios.get(`${import.meta.env.VITE_API_URL}/invoices`, { params: { year: selectedYear } }),
                 ]);
 
                 setExpenses(expensesRes.data);
@@ -38,7 +40,7 @@ function YearOverviewPage() {
         };
 
         void fetchData();
-    }, []);
+    }, [selectedYear]);
 
     // Inkomsten
     const incomeGross = sum(invoices.map(inv => inv.totalInclVat || 0));
@@ -64,7 +66,7 @@ function YearOverviewPage() {
     const selfEmployedDeduction = 3750;
     const starterDeduction = 0;
 
-    const profitBeforeDeductions = profitNet; // profitNet
+    const profitBeforeDeductions = profitNet;
     const profitAfterDeductions = profitBeforeDeductions - selfEmployedDeduction - starterDeduction;
 
     const mkbRelief = profitAfterDeductions * 0.1331;
@@ -81,7 +83,7 @@ function YearOverviewPage() {
 
     return (
         <div>
-            <h2>Jaaroverzicht 2025</h2>
+            <h2>Jaaroverzicht {selectedYear}</h2>
             <div className={styles.overviewContainer}>
                 <section className={styles.totalContainer}>
                     <section>
@@ -111,17 +113,15 @@ function YearOverviewPage() {
                             <li key={category}>{category}: {formatCurrency(total)}</li>
                         ))}
                     </ul>
-
                 </section>
 
                 <section>
-                    <h4>aftrekposten</h4>
+                    <h4>Aftrekposten</h4>
                     <p>Winst vóór ondernemersaftrek: {formatCurrency(profitBeforeDeductions)}</p>
                     <p>Zelfstandigenaftrek: {formatCurrency(selfEmployedDeduction)}</p>
                     <p>Startersaftrek: {formatCurrency(starterDeduction)}</p>
                     <p>MKB-winstvrijstelling (13.31%): {formatCurrency(mkbRelief)}</p>
-                    <p><strong>Winst na zelfstandigenaftrek (belastbare winst): {formatCurrency(taxableProfit)}</strong>
-                    </p>
+                    <p><strong>Winst na zelfstandigenaftrek (belastbare winst): {formatCurrency(taxableProfit)}</strong></p>
                 </section>
 
                 <label>
@@ -149,3 +149,4 @@ function YearOverviewPage() {
 }
 
 export default YearOverviewPage;
+

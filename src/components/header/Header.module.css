@@ -19,3 +19,7 @@ header a.active {
     border-bottom: 1px solid var(--third-color);
     padding-bottom: 0.2rem;
 }
+
+.yearSelector {
+    display: flex;
+}

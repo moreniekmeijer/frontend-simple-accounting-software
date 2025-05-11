@@ -48,6 +48,11 @@ function Header() {
                             Jaaroverzicht
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink to="/company-details" className={({isActive}) => isActive ? "active" : ""}>
+                            Bedrijfsgegevens
+                        </NavLink>
+                    </li>
                 </ul>
             </nav>
         </header>

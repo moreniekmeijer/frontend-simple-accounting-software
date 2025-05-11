@@ -6,6 +6,7 @@ import ClientPage from "./pages/clientPage/ClientPage.jsx";
 import BookingListPage from "./pages/bookingListPage/BookingListPage.jsx";
 import YearOverviewPage from "./pages/yearOverviewPage/YearOverviewPage.jsx";
 import ExpensePage from "./pages/expensePage/ExpensePage.jsx";
+import CompanyDetailsPage from "./pages/companyDetailsPage/companyDetailsPage.jsx";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                     <Route path="/clients" element={<ClientPage />} />
                     <Route path="/bookings" element={<BookingListPage />} />
                     <Route path="/year-overview" element={<YearOverviewPage />} />
+                    <Route path="/company-details" element={<CompanyDetailsPage />} />
                     {/*<Route path="*" element={<NotFoundPage/>}/>*/}
                 </Routes>
             </main>

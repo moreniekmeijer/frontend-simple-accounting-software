@@ -64,7 +64,7 @@ export default function CompanyDetailsPage() {
             <div>
                 <label htmlFor="name">Naam</label>
                 <input id="name" {...register('name')} />
-                {errors.name && <p>{errors.name.message}</p>} {/* Toon foutmelding */}
+                {errors.name && <p>{errors.name.message}</p>}
             </div>
 
             <div>
@@ -104,14 +104,14 @@ export default function CompanyDetailsPage() {
             </div>
 
             <div>
-                <label htmlFor="vatId">BTW-ID</label>
-                <input id="vatId" {...register('vatId')} />
+                <label htmlFor="vatNumber">BTW-ID</label>
+                <input id="vatNumber" {...register('vatNumber')} />
                 {errors.vatId && <p>{errors.vatId.message}</p>}
             </div>
 
             <div>
-                <label htmlFor="kvk">KvK-nummer</label>
-                <input id="kvk" {...register('kvk')} />
+                <label htmlFor="chamberOfCommerce">KvK-nummer</label>
+                <input id="chamberOfCommerce" {...register('chamberOfCommerce')} />
                 {errors.kvk && <p>{errors.kvk.message}</p>}
             </div>
 

@@ -1,18 +1,21 @@
-import React, {useState, useEffect, useRef} from "react";
+import {useState, useEffect, useRef} from "react";
 import axios from "axios";
 import {useForm} from "react-hook-form";
 import DragDrop from "../../components/dragDrop/DragDrop.jsx";
 import Button from "../../components/button/Button.jsx";
+import OpenPdfButton from "../../components/openPdfButton/OpenPdfButton.jsx";
+import styles from "./ExpensePage.module.css";
+import LoadingIcon from "../../components/loadingIcon/LoadingIcon.jsx";
 
 const API_URL = `${import.meta.env.VITE_API_URL}/expenses`;
 
 const ExpensePage = () => {
     const [expenses, setExpenses] = useState([]);
     const [selectedExpenseId, setSelectedExpenseId] = useState("");
-    const [currentExpenseId, setCurrentExpenseId] = useState(null);
-    const [receiptUrl, setReceiptUrl] = useState("");
     const [uploadedFile, setUploadedFile] = useState(null);
     const [isInvestment, setIsInvestment] = useState(null);
+    const [createdExpense, setCreatedExpense] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const dropRef = useRef();
 
     const {
@@ -61,7 +64,6 @@ const ExpensePage = () => {
                 headers: {'Content-Type': 'multipart/form-data'}
             });
             reset(response.data);
-            setCurrentExpenseId(null);
         } catch (error) {
             console.error("Fout bij uploaden OCR:", error);
             alert("Upload van OCR mislukt.");
@@ -70,24 +72,20 @@ const ExpensePage = () => {
 
     const handleExpenseSelect = async (id) => {
         setSelectedExpenseId(id);
-        setCurrentExpenseId(id);
 
         if (!id) {
             reset();
-            setReceiptUrl("");
             return;
         }
 
         try {
             const response = await axios.get(`${API_URL}/${id}`);
-            reset(response.data);
-
-            const receiptResponse = await axios.get(`${API_URL}/${id}/receipt`, {responseType: 'blob'});
-            const imageUrl = URL.createObjectURL(receiptResponse.data);  // Zet de blob om naar een URL
-            setReceiptUrl(imageUrl);
+            const expense = response.data;
+            reset(expense);
+            setCreatedExpense(expense);
         } catch (error) {
-            console.error("Fout bij ophalen bon:", error);
-            alert("Bon niet gevonden.");
+            console.error("Fout bij ophalen van expense:", error);
+            alert("Kan expense niet ophalen.");
         }
     };
 
@@ -106,14 +104,17 @@ const ExpensePage = () => {
                 depreciationYears: data.depreciationYears,
                 residualValue: data.residualValue
             };
-            formData.append("investment", new Blob([JSON.stringify(investmentData)], { type: "application/json" }));
+            formData.append("investment", new Blob([JSON.stringify(investmentData)], {type: "application/json"}));
         }
 
+        setIsLoading(true);
         try {
-            await axios.post(API_URL, formData, {
+            const response = await axios.post(API_URL, formData, {
                 headers: {"Content-Type": "multipart/form-data"}
             });
 
+            const expense = response.data;
+            setCreatedExpense(expense);
             alert("Bon succesvol opgeslagen.");
             reset();
             setUploadedFile(null);
@@ -121,22 +122,8 @@ const ExpensePage = () => {
         } catch (error) {
             console.error("Fout bij opslaan:", error);
             alert("Opslaan mislukt.");
-        }
-    };
-
-    const handleDownload = async () => {
-        if (!currentExpenseId) return;
-        try {
-            const response = await axios.get(`${API_URL}/${currentExpenseId}/receipt`, {
-                responseType: 'blob'
-            });
-            const file = new Blob([response.data], {type: 'application/pdf'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(file);
-            link.download = 'receipt.pdf';
-            link.click();
-        } catch (error) {
-            console.error("Fout bij downloaden bon:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -144,67 +131,64 @@ const ExpensePage = () => {
         <div>
             <h3>Uitgave toevoegen of bewerken</h3>
 
-            <fieldset>
-            <div>
-                <label>Sleep je bon hierheen of klik:</label>
-                <DragDrop ref={dropRef} onFileSelect={handleFileSelect}/>
-            </div>
-
-            <div>
-                <label>Kies een bestaande bon:</label>
-                <select
-                    value={selectedExpenseId}
-                    onChange={(e) => handleExpenseSelect(e.target.value)}
-                >
-                    <option value="">-- Selecteer een bon --</option>
-                    {expenses.map(exp => (
-                        <option key={exp.id} value={exp.id}>
-                            {exp.invoiceNumber || "Zonder nummer"} ({exp.date})
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {receiptUrl && (
-                <div>
-                    <h4>Bonafbeelding</h4>
-                    <img src={receiptUrl} alt="Receipt" style={{maxWidth: '300px', maxHeight: '300px'}}/>
-                    <Button onClick={handleDownload}>Download bon</Button>
-                </div>
-            )}
-            </fieldset>
-
             <form onSubmit={handleSubmit(onSubmit)}>
                 <fieldset>
-                    <div>
-                        <label>Factuurnummer</label>
+                    <DragDrop ref={dropRef} onFileSelect={handleFileSelect}/>
+
+                    <label className={styles.chooseExpense}>
+                        Of kies een bestaande bon:
+                        <select
+                            value={selectedExpenseId}
+                            onChange={(e) => handleExpenseSelect(e.target.value)}
+                        >
+                            <option value="">-- Selecteer een bon --</option>
+                            {expenses.map(exp => (
+                                <option key={exp.id} value={exp.id}>
+                                    {exp.invoiceNumber || "Zonder nummer"} ({exp.date})
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    {createdExpense && createdExpense.driveUrl && (
+                        <OpenPdfButton
+                            driveUrl={createdExpense.driveUrl}
+                            invoiceNumber={createdExpense.invoiceNumber}
+                        />
+                    )}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Uitgave details</legend>
+                    <label>
+                        Factuurnummer
                         <input
                             type="text"
                             {...register("invoiceNumber", {required: "Verplicht veld"})}
                         />
-                        {errors.invoiceNumber && <p>{errors.invoiceNumber.message}</p>}
-                    </div>
+                    </label>
+                    {errors.invoiceNumber && <p>{errors.invoiceNumber.message}</p>}
 
-                    <div>
-                        <label>Datum</label>
+                    <label>
+                        Datum
                         <input
                             type="date"
                             {...register("date", {required: "Datum is verplicht"})}
                         />
-                        {errors.date && <p>{errors.date.message}</p>}
-                    </div>
+                    </label>
+                    {errors.date && <p>{errors.date.message}</p>}
 
-                    <div>
-                        <label>Bedrijf</label>
+                    <label>
+                        Bedrijf
                         <input
                             type="vendor"
                             {...register("vendor", {required: "Bedrijf is verplicht"})}
                         />
-                        {errors.date && <p>{errors.date.message}</p>}
-                    </div>
+                    </label>
+                    {errors.date && <p>{errors.date.message}</p>}
 
-                    <div>
-                        <label>Bedrag</label>
+                    <label>
+                        Bedrag
                         <input
                             type="text"
                             {...register("amount", {
@@ -212,11 +196,11 @@ const ExpensePage = () => {
                                 validate: val => !isNaN(val) || "Moet een getal zijn"
                             })}
                         />
-                        {errors.amount && <p>{errors.amount.message}</p>}
-                    </div>
+                    </label>
+                    {errors.amount && <p>{errors.amount.message}</p>}
 
-                    <div>
-                        <label>BTW</label>
+                    <label>
+                        BTW
                         <input
                             type="text"
                             {...register("vat", {
@@ -225,47 +209,52 @@ const ExpensePage = () => {
                             })}
                             defaultValue="0.21"
                         />
-                        {errors.vat && <p>{errors.vat.message}</p>}
-                    </div>
+                    </label>
+                    {errors.vat && <p>{errors.vat.message}</p>}
 
-                    <div>
-                        <label>Categorie</label>
+                    <label>
+                        Categorie
                         <input
                             type="text"
                             {...register("category")}
                             disabled={isInvestment}
                         />
-                    </div>
+                    </label>
                 </fieldset>
 
                 {isInvestment && (
                     <fieldset>
-                        <label>Afschrijvingsduur (jaren)</label>
-                        <input
-                            type="number"
-                            {...register("depreciationYears", {
-                                required: "Verplicht bij investeringen",
-                                min: {value: 5, message: "Minimaal 5 jaar"}
-                            })}
-                            defaultValue="5"
-                        />
+                        <legend>Investeringsdetails</legend>
+                        <label>
+                            Afschrijvingsduur (jaren)
+                            <input
+                                type="number"
+                                {...register("depreciationYears", {
+                                    required: "Verplicht bij investeringen",
+                                    min: {value: 5, message: "Minimaal 5 jaar"}
+                                })}
+                                defaultValue="5"
+                            />
+                        </label>
                         {errors.depreciationYears && <p>{errors.depreciationYears.message}</p>}
 
-                        <label>Restwaarde (€)</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register("residualValue", {
-                                required: "Verplicht bij investeringen",
-                                min: {value: 0, message: "Kan niet negatief zijn"}
-                            })}
-                            defaultValue="0"
-                        />
+                        <label>
+                            Restwaarde (€)
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...register("residualValue", {
+                                    required: "Verplicht bij investeringen",
+                                    min: {value: 0, message: "Kan niet negatief zijn"}
+                                })}
+                                defaultValue="0"
+                            />
+                        </label>
                         {errors.residualValue && <p>{errors.residualValue.message}</p>}
                     </fieldset>
                 )}
 
-                <Button type="submit">Bijwerken</Button>
+                {isLoading ? <LoadingIcon type="cart"/> : <Button type="submit">Bijwerken</Button>}
             </form>
         </div>
     );

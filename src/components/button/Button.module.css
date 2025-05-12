@@ -1,10 +1,9 @@
 .button {
     font-family: inherit;
-    width: max-content;
-    min-width: 5rem;
+    min-width: max-content;
     height: auto;
-    padding: 0.4rem;
-    margin: 0.1rem;
+    padding: 0.4rem 0.6rem;
+    margin: 0.2rem;
     align-items: center;
     justify-content: center;
     border: none;
@@ -35,6 +34,7 @@
 .danger {
     background-color: transparent;
     border: 1px solid red;
+    padding: 0.3rem 0.5rem;
 }
 
 .danger:hover {
@@ -44,6 +44,7 @@
 .simple {
     background-color: transparent;
     border: 1px solid var(--first-color);
+    padding: 0.3rem 0.5rem;
 }
 
 .simple:hover {
@@ -51,5 +52,5 @@
 }
 
 .simple:active {
-    background-color: var(--first-accent-color);
+    background-color: var(--first-color);
 }

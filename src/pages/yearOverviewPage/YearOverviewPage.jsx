@@ -83,7 +83,7 @@ function YearOverviewPage() {
 
     return (
         <div>
-            <h2>Jaaroverzicht {selectedYear}</h2>
+            <h3>Jaaroverzicht {selectedYear}</h3>
             <div className={styles.overviewContainer}>
                 <section className={styles.totalContainer}>
                     <section>
@@ -124,7 +124,7 @@ function YearOverviewPage() {
                     <p><strong>Winst na zelfstandigenaftrek (belastbare winst): {formatCurrency(taxableProfit)}</strong></p>
                 </section>
 
-                <label>
+                <label className={styles.otherIncomeLabel}>
                     Overige inkomsten (loondienst, etc):
                     <input
                         type="number"

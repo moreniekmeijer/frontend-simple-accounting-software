@@ -80,7 +80,7 @@ function ClientPage() {
                     <input {...register("postalCode")} placeholder="Postcode"/>
                     <input {...register("city")} placeholder="Stad"/>
                     <Button type="submit">{editClientId ? "Bijwerken" : "Toevoegen"}</Button>
-                    {editClientId && <Button type="button" variant="simple" onClick={handleCancelEdit}>Cancel</Button>}
+                    {editClientId && <Button type="button" variant="simple" onClick={handleCancelEdit}>Annuleer</Button>}
                 </fieldset>
             </form>
 
@@ -90,7 +90,7 @@ function ClientPage() {
                     <li key={client.id}>
                         <strong>{client.name}</strong> ({client.contactPerson}) – {client.city}
                         <Button variant="simple" onClick={() => handleEdit(client)}>Bewerk</Button>
-                        <Button variant="simple" onClick={() => handleDelete(client.id)}>Verwijder</Button>
+                        {/*<Button variant="danger" onClick={() => handleDelete(client.id)}>Verwijder</Button>*/}
                     </li>
                 ))}
             </ul>

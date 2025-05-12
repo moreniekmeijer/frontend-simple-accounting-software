@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import Button from "../../components/button/Button.jsx";
 import {yupResolver} from "@hookform/resolvers/yup/src/index.js";
 import * as Yup from "yup";
@@ -18,7 +18,7 @@ const validationSchema = Yup.object({
 }).required();
 
 export default function CompanyDetailsPage() {
-    const { register, handleSubmit, formState: { errors, isSubmitting, isDirty }, reset } = useForm({
+    const {register, handleSubmit, formState: {errors, isSubmitting, isDirty}, reset} = useForm({
         resolver: yupResolver(validationSchema),
     });
 
@@ -59,67 +59,68 @@ export default function CompanyDetailsPage() {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <h1>Bedrijfsgegevens</h1>
+            <h3>Bedrijfsgegevens</h3>
 
-            <div>
-                <label htmlFor="name">Naam</label>
-                <input id="name" {...register('name')} />
+            <fieldset>
+                <label>
+                    Naam
+                    <input {...register('name')} />
+                </label>
                 {errors.name && <p>{errors.name.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="street">Straat</label>
-                <input id="street" {...register('street')} />
+                <label>
+                    Straat
+                    <input {...register('street')} />
+                </label>
                 {errors.street && <p>{errors.street.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="postalCode">Postcode</label>
-                <input id="postalCode" {...register('postalCode')} />
+                <label>
+                    Postcode
+                    <input {...register('postalCode')} />
+                </label>
                 {errors.postalCode && <p>{errors.postalCode.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="city">Woonplaats</label>
-                <input id="city" {...register('city')} />
+                <label>
+                    Woonplaats
+                    <input {...register('city')} />
+                </label>
                 {errors.city && <p>{errors.city.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="phone">Telefoon</label>
-                <input id="phone" {...register('phone')} />
+                <label>
+                    Telefoon
+                    <input {...register('phone')} />
+                </label>
                 {errors.phone && <p>{errors.phone.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="email">Email</label>
-                <input id="email" {...register('email')} />
+                <label>
+                    Email
+                    <input {...register('email')} />
+                </label>
                 {errors.email && <p>{errors.email.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="iban">IBAN</label>
-                <input id="iban" {...register('iban')} />
+                <label>
+                    IBAN
+                    <input {...register('iban')} />
+                </label>
                 {errors.iban && <p>{errors.iban.message}</p>}
-            </div>
 
-            <div>
-                <label htmlFor="vatNumber">BTW-ID</label>
-                <input id="vatNumber" {...register('vatNumber')} />
-                {errors.vatId && <p>{errors.vatId.message}</p>}
-            </div>
+                <label>
+                    BTW-ID
+                    <input {...register('vatNumber')} />
+                </label>
+                {errors.vatNumber && <p>{errors.vatNumber.message}</p>}
 
-            <div>
-                <label htmlFor="chamberOfCommerce">KvK-nummer</label>
-                <input id="chamberOfCommerce" {...register('chamberOfCommerce')} />
-                {errors.kvk && <p>{errors.kvk.message}</p>}
-            </div>
+                <label>
+                    KvK-nummer
+                    <input {...register('chamberOfCommerce')} />
+                </label>
+                {errors.chamberOfCommerce && <p>{errors.chamberOfCommerce.message}</p>}
 
-            <Button type="submit" disabled={isSubmitting || !isDirty}>
-                Opslaan
-            </Button>
+                <Button type="submit" disabled={isSubmitting || !isDirty}>
+                    Opslaan
+                </Button>
 
-            {saved && <p>Gegevens opgeslagen!</p>}
+                {saved && <p>Gegevens opgeslagen!</p>}</fieldset>
         </form>
     );
 }

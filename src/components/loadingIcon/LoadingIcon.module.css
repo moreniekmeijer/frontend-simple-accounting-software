@@ -1,0 +1,41 @@
+.loadingWrapper {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+}
+
+.loadingIcon {
+    display: inline-block;
+    font-size: 2rem;
+    animation-duration: 1.2s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    transform-origin: bottom left;
+}
+
+.pen {
+    animation-name: scribble;
+}
+
+@keyframes scribble {
+    0% {
+        transform: rotate(-25deg) translateX(0);
+    }
+    100% {
+        transform: rotate(15deg) translateX(5px);
+    }
+}
+
+.cart {
+    animation-name: drive;
+}
+
+@keyframes drive {
+    0% {
+        transform: translateX(-10px) rotate(0deg);
+    }
+    100% {
+        transform: translateX(10px) rotate(5deg);
+    }
+}

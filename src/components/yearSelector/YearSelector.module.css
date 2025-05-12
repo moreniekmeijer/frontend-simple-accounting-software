@@ -1,0 +1,8 @@
+.yearSelector {
+    display: flex;
+    max-width: max-content;
+}
+
+.yearSelector select {
+    min-width: 4.2rem;
+}

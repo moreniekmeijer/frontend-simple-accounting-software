@@ -1,12 +1,12 @@
 import styles from './Button.module.css';
 
-function Button({ variant = "primary", className, onClick, disabled, children }) {
+function Button({ type = "button", variant = "primary", className, onClick, disabled, children }) {
     const variantClass = styles[variant] || "";
 
     const buttonClass = `${styles.button} ${variantClass} ${className || ""}`.trim();
 
     return (
-        <button className={buttonClass} onClick={onClick} disabled={disabled}>
+        <button type={type} className={buttonClass} onClick={onClick} disabled={disabled}>
             {children}
         </button>
     );

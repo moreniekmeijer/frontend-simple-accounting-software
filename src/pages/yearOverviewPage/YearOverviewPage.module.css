@@ -11,3 +11,12 @@
     padding: 1rem;
     border-bottom: 1px solid var(--third-color);
 }
+
+.otherIncomeLabel {
+    max-width: max-content;
+    margin: auto;
+}
+
+.otherIncomeLabel input {
+    max-width: 4rem;
+}

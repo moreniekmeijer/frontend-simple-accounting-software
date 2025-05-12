@@ -1,55 +1,43 @@
 import {NavLink} from "react-router-dom";
 import "./Header.module.css";
-import {useYear} from "../../contexts/YearContext.jsx";
 import styles from "./Header.module.css";
+import YearSelector from "../yearSelector/YearSelector.jsx";
 
 function Header() {
-    const {selectedYear, setSelectedYear} = useYear();
-
-    const handleYearChange = (e) => {
-        setSelectedYear(Number(e.target.value));
-    };
-
     return (
-        <header className="header">
+        <header className={styles.header}>
             <h1>Simpel boekhouden! 🖊️</h1>
-            <div className={styles.yearSelector}>
-                <label htmlFor="year">Jaar: </label>
-                <select id="year" value={selectedYear} onChange={handleYearChange}>
-                    {[2022, 2023, 2024, 2025].map((year) => (
-                        <option key={year} value={year}>{year}</option>
-                    ))}
-                </select>
-            </div>
+            <YearSelector />
+
             <nav>
-                <ul className="nav-list">
+                <ul>
                     <li>
-                        <NavLink to="/invoices" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/invoices" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Inkomsten
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/expenses" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/expenses" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Uitgaven
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/clients" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/clients" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Cliënten
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/bookings" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/bookings" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Boekingslijst
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/year-overview" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/year-overview" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Jaaroverzicht
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink to="/company-details" className={({isActive}) => isActive ? "active" : ""}>
+                        <NavLink to="/company-details" className={({isActive}) => isActive ? styles.activeMenuLink : ""}>
                             Bedrijfsgegevens
                         </NavLink>
                     </li>

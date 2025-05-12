@@ -1,22 +1,26 @@
 .bookingList {
-    width: 100%;
+    max-width: 100%;
+}
+
+.tableWrapper {
     overflow-x: auto;
-    min-width: 40rem;
+    width: 100%;
+    margin-block: 0.4rem;
 }
 
 .bookingList table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px; /* optioneel, voorkomt dat kolommen te smal worden */
+    min-width: max-content;
 }
 
 .bookingList th,
 .bookingList td {
-    border: 1px solid var(--third-color);
-    padding: 0.5rem;
+    border: 1px solid var(--second-hover-color);
+    padding: 0.2rem;
     text-align: left;
 }
 
 .bookingList thead {
-    background-color: var(--second-color);
+    background-color: var(--second-hover-color);
 }

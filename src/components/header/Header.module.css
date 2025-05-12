@@ -1,25 +1,40 @@
-header {
+.header {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
-    padding-bottom: 1rem;
     margin-bottom: 1rem;
     align-items: center;
     border-bottom: 1px solid var(--third-color);
 }
 
-header ul {
+.header ul {
     display: flex;
-    flex-direction: row;
-    gap: 1rem;
 }
 
-header a.active {
-    border-bottom: 1px solid var(--third-color);
-    padding-bottom: 0.2rem;
+.header li {
+    padding: 0.2rem;
 }
 
-.yearSelector {
-    display: flex;
+.header a {
+    padding: 0.42rem;
+}
+
+.activeMenuLink {
+    border: 1px solid var(--third-color);
+    border-bottom: none;
+    border-radius: 0.6rem 0.6rem 0 0;
+    background: var(--background-color);
+}
+
+@media (max-width: 660px) {
+    .activeMenuLink {
+        border: none;
+        color: var(--third-color);
+        background: transparent;
+    }
+
+    .header ul {
+        flex-wrap: wrap;
+    }
 }

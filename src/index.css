@@ -17,16 +17,16 @@
     --first-accent-color: #1a7149;
     --first-hover-color: #7ce8ad;
     --second-color: #ad9aea;
-    --second-hover-color: #bbb6e4;
+    --second-hover-color: #c6c0ff;
     --second-accent-color: #8265ea;
-    --third-color: #222d57;
+    --third-color: #17224c;
     --danger-color: #ff0004;
-    --danger-hover-color: #ffaeaf;
+    --danger-hover-color: #ffc8d5;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'cal sans', sans-serif;
-    color: var(--text-color-dark);
+    color: var(--third-color);
     margin-bottom: 0.4rem;
 }
 
@@ -74,25 +74,75 @@ a:hover, Link:hover {
     color: var(--first-hover-color);
 }
 
+a:active {
+    color: var(--first-accent-color);
+}
+
 input, select, textarea {
+    width: 100%;
+    margin: 0.2rem;
     border: 1px solid var(--second-hover-color);
     border-radius: 1rem;
     padding: 0.1rem 0.2rem;
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+label {
+    width: 100%;
+    max-width: 18rem;
+    margin-top: 0.2rem;
 }
 
 form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 fieldset {
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 60rem;
-    gap: 1rem;
-    border: 1px solid var(--second-color);
+    margin: 0.4rem auto;
+    border: 1px solid var(--second-hover-color);
     border-radius: 1rem;
     padding: 1rem;
+}
+
+html {
+    font-size: 16px;
+}
+
+@media (min-width: 1440px) {
+    html {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 400px) {
+    html {
+        font-size: 12px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
 }

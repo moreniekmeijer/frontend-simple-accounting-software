@@ -1,12 +1,49 @@
-# React + Vite
+# Frontend Simple Accounting Software
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+De frontend voor de Simple Accounting Software, gebouwd met React en Vite. Deze interface maakt verbinding met de backend API.
 
-Currently, two official plugins are available:
+## Vereisten
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Zorg dat je het volgende hebt geïnstalleerd:
 
-## Expanding the ESLint configuration
+- Node.js (versie 18 of hoger aanbevolen)
+- npm (of yarn)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Installatie
+
+### 1. Repository clonen
+
+```bash
+git clone https://github.com/moreniekmeijer/frontend-simple-accounting-software.git
+cd frontend-simple-accounting-software
+```
+
+### 2. Afhankelijkheden installeren
+
+```bash
+npm install
+```
+
+### 3. `.env` bestand aanmaken
+
+Maak een `.env` bestand aan in de root van het project met de volgende inhoud:
+
+```env
+VITE_API_URL=http://localhost:8080
+```
+
+> Pas `VITE_API_URL` aan indien je backend op een andere poort of host draait.
+
+### 4. Start de ontwikkelserver
+
+```bash
+npm run dev
+```
+
+De frontend is nu bereikbaar op `http://localhost:5173` (tenzij anders aangegeven in de terminal).
+
+## Backend nodig
+
+Zorg dat de backend draait op de opgegeven `VITE_API_URL` voor correcte werking. 
+Zie:  
+👉 [backend-simple-accounting-software](https://github.com/moreniekmeijer/backend-simple-accounting-software)
